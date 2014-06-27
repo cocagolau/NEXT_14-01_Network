@@ -44,23 +44,20 @@ void response_data ( FILE * fp, char * content_type, char * file_name ) {
 	int str_len;
 	long content_sz;
 
-	sprintf ( protocol, "HTTP/1.0 %d OK\r\n", protocol_status_code );
+	sprintf ( protocol, "HTTP/1.1 %d OK\r\n", protocol_status_code );
 	sprintf ( cnt_type, "Content-type:%s\r\n\r\n", content_type );
 
 
 	// printf ( "file_name: %s \n", file_name );
 	strcpy(destination, ROOT_DIR);
 	strcat(destination, file_name);
-	// printf ("dest: %s\n", destination);
 
 	// send_file = fopen ( file_name, "rb" );
 	send_file = fopen ( destination, "rb" );
 
 	// content size 측정
-	fseek ( send_file, 0L, SEEK_END );
-	content_sz = ftell ( send_file );
+	content_sz = get_file_size(destination);
 	printf ("filesz: %ld\n", content_sz);
-	fseek ( send_file, 0L, SEEK_SET );
 
 	sprintf ( cnt_len, "Content-length:%ld\r\n", content_sz );
 
@@ -82,8 +79,6 @@ void response_data ( FILE * fp, char * content_type, char * file_name ) {
 }
 
 char * content_type ( char * file ) {
-	printf ("path: %s\n", file);
-
 	char extenstion [ BUF_SIZE ];
 	char file_name [ BUF_SIZE ];
 
@@ -97,6 +92,17 @@ char * content_type ( char * file ) {
 		return "image/png";
 	else if ( !strcmp ( extenstion, "pdf" ) )
 		return "application/pdf";
+	else if ( !strcmp ( extenstion, "mkv" ) )
+		return "video/x-ms-video";
 	else
 		return "text/plain";
+}
+
+size_t get_file_size (const char * file_name) {
+	struct stat sb;
+		if (stat (file_name, &sb) != 0) {
+			fprintf (stderr, "'stat' failed for '%s': %s.\n", file_name, strerror (errno));
+			exit (EXIT_FAILURE);
+		}
+	return sb.st_size;
 }

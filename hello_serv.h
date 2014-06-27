@@ -10,6 +10,8 @@
 #include <sys/socket.h>
 #include <sys/epoll.h>
 #include <time.h>
+#include <errno.h>
+#include "sys/stat.h"
 
 
 
@@ -70,6 +72,9 @@ void * worker_main ( void * arg );
 
 // monitor
 void * monitor_main ( void * arg );
+
+size_t get_file_size (const char * file_name);
+char * get_file_name (char * path);
 
 // int clnt_socks[MAX_CLIENT];
 // int clnt_cnt;

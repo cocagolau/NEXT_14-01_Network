@@ -2,14 +2,13 @@
 
 
 int request_handler ( int * req_status, FILE * clnt_read, FILE * clnt_write ) {
-	
 	int i = 0;
 	char req_line [ BUF_SIZE ];
-	
-
-	char method [ 10 ];
-	char con_type [ 15 ];
-	char file_name [ 30 ];
+	char method[16];
+	char con_type[128];
+	char file_name[256];
+	char path[256];
+	char version[16];
 
 	// request 상태 초기화
 	*req_status = 0;
@@ -25,17 +24,14 @@ int request_handler ( int * req_status, FILE * clnt_read, FILE * clnt_write ) {
 		return SOCK_CONN;
 	}
 
-	strcpy ( method, strtok ( req_line, " /" ) );
-	strcpy ( file_name, strtok ( NULL, " /" ) );
-	strcpy ( con_type, content_type ( file_name ) );
+	sscanf(req_line, "%s %s %s\r\n", method, path, version);
 
+	strcpy(file_name, get_file_name(path));
+	strcpy(con_type, content_type(file_name));
 
 	if ( strcmp ( method, "POST" ) == 0 ) {
 		return SOCK_DISCONN;
 	}
-	// else if ( strcmp ( method, "GET" ) == 0 ) {
-		
-	// }
 
 	// 2번째 라인부터 헤더 읽기
 	while ( fgets ( req_line, BUF_SIZE, clnt_read ) ) {
@@ -48,4 +44,20 @@ int request_handler ( int * req_status, FILE * clnt_read, FILE * clnt_write ) {
 
 	return SOCK_CONN;
 	
+}
+
+char * get_file_name (char * path) {
+	char * first_separated = strtok(path, "/");
+	char * second_separated = NULL;
+
+	if (first_separated != NULL) {
+		while ( (second_separated = strtok(NULL, "/")) != NULL ) {
+			first_separated = second_separated;	
+		}	
+	}
+	else {
+		first_separated = "index.html";
+	}
+
+	return first_separated;
 }
