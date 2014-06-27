@@ -20,6 +20,7 @@ int main ( int argc, char * argv[] ) {
 	pid_t pid;
 	pthread_t t_id;
 	int num_of_worker = 0;
+	http_server_t * server;
 
 	extern pthread_mutex_t mutx;
 
@@ -30,25 +31,26 @@ int main ( int argc, char * argv[] ) {
 	// 	clnt_socks[i] = 0;
 	// }
 
-	if ( argc != 2 ) {
-		error_less_argc ( argc, argv );
+	if (argc != 2) {
+		error_less_argc(argc, argv);
 	}
 
-	// pthread_mutex_init ( &mutx, NULL );
-	serv_sock = socket ( PF_INET, SOCK_STREAM, 0 );
+	pthread_mutex_init ( &mutx, NULL );
+	// serv_sock = socket ( PF_INET, SOCK_STREAM, 0 );
 
-	memset ( &serv_adr, 0, sizeof ( serv_adr ) );
-	serv_adr.sin_family = AF_INET;
-	serv_adr.sin_addr.s_addr = htonl ( INADDR_ANY );
-	serv_adr.sin_port = htons ( atoi ( argv[1] ) );
+	// memset ( &serv_adr, 0, sizeof ( serv_adr ) );
+	// serv_adr.sin_family = AF_INET;
+	// serv_adr.sin_addr.s_addr = htonl ( INADDR_ANY );
+	// serv_adr.sin_port = htons ( atoi ( argv[1] ) );
 
-	if ( bind ( serv_sock, ( struct sockaddr* ) &serv_adr, sizeof ( serv_adr ) ) == -1 ) {
-		error_handling ( "bind() error" );
-	}
+	// if ( bind ( serv_sock, ( struct sockaddr* ) &serv_adr, sizeof ( serv_adr ) ) == -1 ) {
+	// 	error_handling ( "bind() error" );
+	// }
 
-	if ( listen ( serv_sock, 5 ) == -1 ) {
-		error_handling ( "listen() error" );
-	}
+	// if ( listen ( serv_sock, 5 ) == -1 ) {
+	// 	error_handling ( "listen() error" );
+	// }
+	server = http_server_init(atoi(argv[1]), &mutx);
 
 	// 타임아웃이 필요한 소켓 확인 
 	pthread_create ( &t_id, NULL, monitor_main, ( void * ) clnt_socks );
@@ -56,7 +58,8 @@ int main ( int argc, char * argv[] ) {
 
 	while ( 1 ) {
 		clnt_adr_size = sizeof ( clnt_adr );
-		clnt_sock = accept ( serv_sock, ( struct sockaddr* ) &clnt_adr, &clnt_adr_size );
+		// clnt_sock = accept ( serv_sock, ( struct sockaddr* ) &clnt_adr, &clnt_adr_size );
+		clnt_sock = accept(server->sock, (struct sockaddr *) &clnt_adr, &clnt_adr_size);
 
 
 		// client socket을 유지할 메모리 할당 
@@ -84,7 +87,8 @@ int main ( int argc, char * argv[] ) {
 		pthread_detach ( t_id );
 	}
 
-	close ( serv_sock );
+	// close ( serv_sock );
+	close(server->sock);
 
 	return 0;
 }
