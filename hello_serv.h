@@ -51,7 +51,6 @@ int request_handler ( int * req_status, FILE * clnt_read, FILE * clnt_write );
 void response_error ( FILE * fp );
 void response_data ( FILE * fp, char * ct, char * file_name );
 
-char * content_type ( char * file );
 // void response_conn_close ( FILE * fp );
 
 
@@ -67,14 +66,16 @@ void * worker_main ( void * arg );
 // disconnection
 // void * disconnect_worker ( void * arg );
 
-// utility
+
 
 
 // monitor
 void * monitor_main ( void * arg );
 
+// utility
 size_t get_file_size (const char * file_name);
 char * get_file_name (char * path);
+char * content_type ( char * file );
 
 // int clnt_socks[MAX_CLIENT];
 // int clnt_cnt;

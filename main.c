@@ -30,8 +30,6 @@ int main ( int argc, char * argv[] ) {
 	// 	clnt_socks[i] = 0;
 	// }
 
-
-
 	if ( argc != 2 ) {
 		error_less_argc ( argc, argv );
 	}

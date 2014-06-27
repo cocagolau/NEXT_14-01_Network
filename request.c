@@ -45,19 +45,3 @@ int request_handler ( int * req_status, FILE * clnt_read, FILE * clnt_write ) {
 	return SOCK_CONN;
 	
 }
-
-char * get_file_name (char * path) {
-	char * first_separated = strtok(path, "/");
-	char * second_separated = NULL;
-
-	if (first_separated != NULL) {
-		while ( (second_separated = strtok(NULL, "/")) != NULL ) {
-			first_separated = second_separated;	
-		}	
-	}
-	else {
-		first_separated = "index.html";
-	}
-
-	return first_separated;
-}
