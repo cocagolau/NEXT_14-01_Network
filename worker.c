@@ -1,10 +1,12 @@
 #include "hello_serv.h"
 
-void * worker_main ( void * arg ) {
+void * worker_main (void * arg) {
 
-	sock_t * clnt = ( sock_t * ) arg;
+	// sock_t * clnt = ( sock_t * ) arg;
+	http_client_t * clnt = (http_client_t *)arg;
 
-	int clnt_sock = clnt->sock_fd;
+	int clnt_sock = clnt->sock;
+	// int clnt_sock = clnt->sock_fd;
 	int str_len = 0, i, req_result = 0, req_status;
 	char msg [ BUF_SIZE ];
 
@@ -12,10 +14,10 @@ void * worker_main ( void * arg ) {
 	FILE * clnt_write;
 
 
-	printf ( "SOCK(%d) CONN\n", clnt_sock );
+	printf("SOCK(%d) CONN\n", clnt_sock);
 
-	clnt_read = fdopen ( clnt_sock, "r" );
-	clnt_write = fdopen ( dup ( clnt_sock ), "wb" );
+	clnt_read = fdopen(clnt_sock, "r");
+	clnt_write = fdopen(dup(clnt_sock), "wb");
 	
 
 	while ( !req_result ) {
@@ -26,8 +28,8 @@ void * worker_main ( void * arg ) {
 	fclose ( clnt_read );
 	
 
-	printf ( "SOCK(%d) DISCONN\n", clnt_sock );
-	free ( arg );
+	printf ("SOCK(%d) DISCONN\n", clnt_sock);
+	free (arg);
 	
 	
 	return NULL;
