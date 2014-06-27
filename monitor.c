@@ -14,13 +14,6 @@ void * monitor_main (void * arg) {
 		for ( i = 0; i < clients->bufptr; i++ ) {
 			cur_client = clients->buf[i];
 			printf ("SOCK(%d).sock: %ld \n", i, cur_client->sock);
-			// if ( cur_client != NULL ) {
-			// 	if ( cur_client->sock != 0 ) {
-			// 	// if ( temp_sock->sock_fd != 0 )
-			// 		// printf ( "SOCK(%d).sock_fd: %ld \n", i, temp_sock->sock_fd );
-			// 		printf ("SOCK(%d).sock: %ld \n", i, cur_client->sock);
-			// 	}
-			// }
 		}
 	}
 	printf ( "\n" );

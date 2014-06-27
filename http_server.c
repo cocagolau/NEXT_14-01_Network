@@ -8,8 +8,10 @@
 // 	int start_pos;
 // } file_sector_t;
 
-http_server_t * http_server_init(int port, pthread_mutex_t * mutx) {
-	http_server_t * new_server = (http_server_t *) malloc (sizeof(http_server_t) * 1);
+// http_server_t * http_server_init(int port, pthread_mutex_t * mutx) {
+http_server_t * http_server_init(int port) {
+	http_server_t * new_server = (http_server_t *) malloc (1 * sizeof(http_server_t));
+	pthread_mutex_t * mutx;
 
 	if (new_server != NULL) {
 		new_server->sock = unix_tcp_create_socket();
@@ -22,8 +24,15 @@ http_server_t * http_server_init(int port, pthread_mutex_t * mutx) {
 		unix_tcp_listen(new_server->sock);
 
 		// mutex init
-		new_server->mutx = mutx;
+		// extern pthread_mutex_t mutx;
+		mutx = (pthread_mutex_t *) malloc (1 * sizeof(pthread_mutex_t));
+		if (mutx != NULL) {
+			new_server->mutx = mutx;
+			pthread_mutex_init (mutx, NULL);
+		}
 
+		http_client_buffer_init(&new_server->clients);
+		
 		// client buffer init
 		// unix_buffer_int_init(&new_server->clients);
 	}
@@ -37,8 +46,21 @@ http_server_t * http_server_init(int port, pthread_mutex_t * mutx) {
 // }
 
 void http_server_destroy(http_server_t * server) {
-	close(server->sock);
-	free(server);
+	
+	if (server !=NULL ) {
+		if (server->mutx != NULL) {
+			free (server->mutx);
+		}
+
+		close(server->sock);
+		free(server);
+	}
+}
+
+void http_server_add_client(http_server_t * server, http_client_t * client) {
+	pthread_mutex_lock(server->mutx);
+	http_client_buffer_add(&server->clients, client);
+	pthread_mutex_unlock(server->mutx);
 }
 
 // void http_server_add_client(http_server_t * server, int sock) {

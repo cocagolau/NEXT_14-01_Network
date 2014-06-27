@@ -102,32 +102,11 @@ int unix_tcp_accept(int sock, struct sockaddr_in * sock_addr, int * clnt_sock_si
 void unix_tcp_destroy_safety(int sock);
 
 
-// http_server
-typedef struct {
-	long sock;
-	struct sockaddr_in addr;
-	pthread_mutex_t * mutx;
-	// unix_buffer_t clients[CLIENT_COUNT];
-
-	// int clients[CLIENT_COUNT];
-	// int clients_sz;
-	// unix_buffer_int_t clients;
-
-} http_server_t;
-
-http_server_t * http_server_init(int port, pthread_mutex_t * mutx);
-void http_server_service(http_server_t * server);
-void http_server_destroy(http_server_t * server);
-// void http_server_add_client(http_server_t * server, int sock);
-// void http_server_remove_client(http_server_t * server, int sock);
-// int http_server_index_of_client(http_server_t * server, int sock);
-
-
-// http_header
 #define LINE_KEY_SZ 128
 #define LINE_VAL_SZ 1024
 #define LINE_COUNT 128
 
+// http_server
 typedef struct {
 	char key[LINE_KEY_SZ];
 	char val[LINE_VAL_SZ];
@@ -141,15 +120,6 @@ typedef struct {
 	Line_t lines[LINE_COUNT];
 } http_header_t;
 
-Line_t http_header_parse_line(char line[]);
-Line_t * http_header_find_key(http_header_t * header, char * key);
-int http_header_add_line(http_header_t * header, Line_t line);
-http_header_t * http_header_init(char header_line[]);
-void http_header_destroy(http_header_t * header);
-void http_header_parse_header(http_header_t * header, char line[]);
-
-
-// http_client
 typedef struct {
 	long sock;
 	struct sockaddr_in addr;
@@ -164,13 +134,6 @@ typedef struct {
 	http_header_t * header;
 } http_client_t;
 
-
-http_client_t * http_client_create(pthread_mutex_t * mutx);
-void http_client_destroy(http_client_t * client);
-void http_client_record_sock(http_client_t * client, int sock);
-
-
-// http_client_buffer
 typedef struct {
 	http_client_t ** buf;
 	int bufsiz;
@@ -178,9 +141,53 @@ typedef struct {
 } http_client_buffer_t;
 
 
+
+typedef struct {
+	long sock;
+	struct sockaddr_in addr;
+	pthread_mutex_t * mutx;
+
+	http_client_buffer_t clients;
+	// unix_buffer_t clients[CLIENT_COUNT];
+
+	// int clients[CLIENT_COUNT];
+	// int clients_sz;
+	// unix_buffer_int_t clients;
+
+} http_server_t;
+
+
+// http_header
+
+
+Line_t http_header_parse_line(char line[]);
+Line_t * http_header_find_key(http_header_t * header, char * key);
+int http_header_add_line(http_header_t * header, Line_t line);
+http_header_t * http_header_init(char header_line[]);
+void http_header_destroy(http_header_t * header);
+void http_header_parse_header(http_header_t * header, char line[]);
+
+
+// http_client
+http_client_t * http_client_create(pthread_mutex_t * mutx);
+void http_client_destroy(http_client_t * client);
+void http_client_record_sock(http_client_t * client, int sock);
+
+
+// http_client_buffer
 void http_client_buffer_init(http_client_buffer_t * clients);
 void http_client_buffer_destroy(http_client_buffer_t * clients);
 int http_client_buffer_extend(http_client_buffer_t * clients);
 int http_client_buffer_add(http_client_buffer_t * clients, http_client_t * client);
 int http_client_buffer_remove(http_client_buffer_t * clients, http_client_t * client);
 int http_client_buffer_index_of(http_client_buffer_t * clients, http_client_t * client);
+
+
+// http_server_t * http_server_init(int port, pthread_mutex_t mutx);
+http_server_t * http_server_init(int port);
+void http_server_service(http_server_t * server);
+void http_server_destroy(http_server_t * server);
+void http_server_add_client(http_server_t * server, http_client_t * client);
+// void http_server_add_client(http_server_t * server, int sock);
+// void http_server_remove_client(http_server_t * server, int sock);
+// int http_server_index_of_client(http_server_t * server, int sock);
