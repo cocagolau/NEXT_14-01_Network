@@ -25,7 +25,7 @@ int request_handler ( int * req_status, FILE * clnt_read, FILE * clnt_write ) {
 	}
 
 	sscanf(req_line, "%s %s %s\r\n", method, path, version);
-
+	printf ("here");
 	strcpy(file_name, get_file_name(path));
 	strcpy(con_type, content_type(file_name));
 
@@ -40,7 +40,7 @@ int request_handler ( int * req_status, FILE * clnt_read, FILE * clnt_write ) {
 			break;
 		}
 	}
-	response_data ( clnt_write, con_type, file_name );
+	response_data (clnt_write, con_type, file_name);
 
 	return SOCK_CONN;
 	
