@@ -12,9 +12,25 @@ http_client_t * http_client_create(pthread_mutex_t * mutx) {
 	return new_client;
 }
 
-void http_client_destroy(http_client_t * client) {
+void http_client_destroy(http_server_t * server, http_client_t * client) {
+
 	if (client != NULL) {
+		printf ("SOCK(%ld) DISCONN\n", client->sock);
+
+		if (client->write != 0) {
+			fclose(client->write);
+			client->write = 0;	
+		}
+
+		if (client->read != 0) {
+			fclose(client->read);
+			client->read = 0;		
+		}
+		// dismiss thread at monitor
+		http_server_monitor_remove_client(server, client);
+
 		free(client);
+		client = NULL;
 	}
 }
 
@@ -108,4 +124,25 @@ int http_client_buffer_index_of(http_client_buffer_t * clients, http_client_t * 
 	}
 
 	return -1;
+}
+
+
+// http_client_worker
+void * http_client_worker_main (void * arg) {
+	http_client_t * client = (http_client_t *)arg;
+	int str_len = 0, i, req_result = 0, req_status;
+	char msg[BUF_SIZE];
+
+	printf("SOCK(%ld) CONN\n", client->sock);
+
+	client->read = fdopen(client->sock, "r");
+	client->write = fdopen(dup(client->sock), "wb");
+
+	while ( !req_result ) {
+		req_result = request_handler ( &req_status, client->read, client->write);
+	}
+	// update client status
+	client->state = -1;
+
+	return NULL;
 }

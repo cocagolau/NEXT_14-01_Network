@@ -65,7 +65,7 @@ void error_handling ( char * message );
 
 
 // worker thread
-void * worker_main ( void * arg );
+// void * worker_main ( void * arg );
 
 
 // disconnection
@@ -74,7 +74,7 @@ void * worker_main ( void * arg );
 
 
 // monitor
-void * monitor_main ( void * arg );
+// void * monitor_main ( void * arg );
 
 // utility
 size_t get_file_size (const char * file_name);
@@ -128,19 +128,18 @@ typedef struct {
 	pthread_mutex_t * mutx;
 	time_t last_conn_time;
 
-	// FILE * read;
-	// FILE * write;
+	FILE * read;
+	FILE * write;
 
 	http_header_t * header;
 } http_client_t;
+
 
 typedef struct {
 	http_client_t ** buf;
 	int bufsiz;
 	int bufptr;
 } http_client_buffer_t;
-
-
 
 typedef struct {
 	long sock;
@@ -156,7 +155,6 @@ typedef struct {
 
 } http_server_t;
 
-
 // http_header
 
 
@@ -170,7 +168,7 @@ void http_header_parse_header(http_header_t * header, char line[]);
 
 // http_client
 http_client_t * http_client_create(pthread_mutex_t * mutx);
-void http_client_destroy(http_client_t * client);
+void http_client_destroy(http_server_t * server, http_client_t * client);
 void http_client_record_sock(http_client_t * client, int sock);
 
 
@@ -183,11 +181,43 @@ int http_client_buffer_remove(http_client_buffer_t * clients, http_client_t * cl
 int http_client_buffer_index_of(http_client_buffer_t * clients, http_client_t * client);
 
 
+// http_client_worker
+void * http_client_worker_main (void * arg);
+
+
+
 // http_server_t * http_server_init(int port, pthread_mutex_t mutx);
 http_server_t * http_server_init(int port);
 void http_server_service(http_server_t * server);
 void http_server_destroy(http_server_t * server);
-void http_server_add_client(http_server_t * server, http_client_t * client);
+void http_server_monitor_add_client(http_server_t * server, http_client_t * client);
+void http_server_monitor_remove_client(http_server_t * server, http_client_t * client);
 // void http_server_add_client(http_server_t * server, int sock);
 // void http_server_remove_client(http_server_t * server, int sock);
 // int http_server_index_of_client(http_server_t * server, int sock);
+
+// http_client_monitor
+void * http_server_monitor_main (void * arg);
+
+
+// http_file_manager
+// #define FILE_SECTOR_SZ 4096
+
+
+// typedef struct {
+// 	int client_count;
+// 	int start_pos;
+// 	char_buffer_t buf;
+// } file_sector_t;
+
+
+// typedef struct {
+// 	file_sector_t ** buf;
+// 	char * file_name;
+
+
+// } file_t;
+
+// typedef struct {
+
+// } file_buffer_t;
