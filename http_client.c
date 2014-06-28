@@ -130,8 +130,9 @@ int http_client_buffer_index_of(http_client_buffer_t * clients, http_client_t * 
 // http_client_worker
 void * http_client_worker_main (void * arg) {
 	http_client_t * client = (http_client_t *)arg;
-	int str_len = 0, i, req_result = 0, req_status;
-	char msg[BUF_SIZE];
+	// int str_len = 0, i;
+	int req_result = 0, req_status;
+	// char msg[BUF_SIZE];
 
 	printf("SOCK(%ld) CONN\n", client->sock);
 
@@ -139,10 +140,20 @@ void * http_client_worker_main (void * arg) {
 	client->write = fdopen(dup(client->sock), "wb");
 
 	while ( !req_result ) {
-		req_result = request_handler ( &req_status, client->read, client->write);
+		req_result = request_handler(&req_status, client->read, client->write);
 	}
 	// update client status
-	client->state = -1;
+	client->state = CLIENT_DEAD;
 
 	return NULL;
 }
+
+// void http_client_check_timeout (http_client_t * client) {
+// 	time_t cur_time;
+// 	time(&cur_time);
+
+// 	if (cur_time - client->last_conn_time >= CLIENT_TIMEOUT) {
+// 		printf ("SOCK(%ld) timeout\n", client->sock);
+// 		client->state = CLIENT_DEAD;
+// 	}
+// }

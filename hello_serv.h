@@ -33,7 +33,11 @@
 #define MAX_CLIENT 1000
 #define MAX_SOCK_PER_CLNT 10
 #define MAX_SOCK 100
-#define TIME_OUT 30
+// #define TIME_OUT 30
+
+// client timeout 15 sec
+#define CLIENT_TIMEOUT 15
+#define CLIENT_DEAD -1
 
 #define ROOT_FOLDER "public"
 #define SRC_FOLDER "src"
@@ -183,6 +187,9 @@ int http_client_buffer_index_of(http_client_buffer_t * clients, http_client_t * 
 
 // http_client_worker
 void * http_client_worker_main (void * arg);
+
+// http_client_timeout
+void http_client_check_timeout (http_client_t * client);
 
 
 
